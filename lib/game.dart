@@ -190,10 +190,12 @@ class _MyHomePageState extends State<MyHomePage> {
     else if (li.length < 5)
       li.add(score.toString());
     else {
-      li.sort();
+      li.sort((a, b) {
+      return int.parse(a).compareTo(int.parse(b));
+    });
       if (score > int.parse(li[0])) li[0] = score.toString();
     }
-    print(li);
+
     prefs.setStringList("highscores", li);
   }
 
