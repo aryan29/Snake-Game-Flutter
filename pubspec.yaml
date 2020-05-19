@@ -14,7 +14,7 @@ description: A new Flutter project.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.3.0 <3.0.0"
+  sdk: ">=2.4.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -29,6 +29,7 @@ dependencies:
   flare_flutter: ^2.0.3
   assets_audio_player: ^1.4.7+2
   share: ^0.6.4+2
+  flutter_colorpicker: ^0.3.4
 
 dev_dependencies:
   flutter_test:

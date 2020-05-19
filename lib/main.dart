@@ -1,3 +1,4 @@
+import 'package:animations/GameSettings.dart';
 import 'package:animations/highscores.dart';
 import 'package:flutter/material.dart';
 import 'package:liquid_button/liquid_button.dart';
@@ -8,6 +9,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import './game.dart';
 import './SettingScreen.dart';
 
+/*
+Auhtor Name - Aryan Khandelwal
+College - BIT MESRA
+Branch - IT
+ */
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -32,6 +38,18 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  @override
+  void initState() {
+    super.initState();
+    _prefs.then((SharedPreferences prefs) {
+      if (prefs.containsKey("sounds"))
+        GameSettings.sounds = prefs.getBool("sounds");
+      if (prefs.containsKey("controltype"))
+        GameSettings.controltype = prefs.getInt("controltype");
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,7 +89,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     margin: EdgeInsets.all(10),
                     child: InkWell(
                       onTap: () {
-                        assetsAudioPlayer.open(Audio("assets/2.mp3"));
+                        if (GameSettings.sounds == true) {
+                          assetsAudioPlayer.open(Audio("assets/2.mp3"));
+                        }
                         Navigator.push(context,
                             MaterialPageRoute(builder: (context) => MyApp2()));
                       },
@@ -92,7 +112,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     margin: EdgeInsets.all(10),
                     child: InkWell(
                       onTap: () async {
-                        assetsAudioPlayer.open(Audio("assets/2.mp3"));
+                        if (GameSettings.sounds == true) {
+                          assetsAudioPlayer.open(Audio("assets/2.mp3"));
+                        }
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -115,12 +137,13 @@ class _MyHomePageState extends State<MyHomePage> {
                     margin: EdgeInsets.all(10),
                     child: InkWell(
                       onTap: () {
-                        assetsAudioPlayer.open(Audio("assets/2.mp3"));
-                                                Navigator.push(
+                        if (GameSettings.sounds == true) {
+                          assetsAudioPlayer.open(Audio("assets/2.mp3"));
+                        }
+                        Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => SettingScreen()));
-
                       },
                       child: LiquidButton(
                         backgroundColor: Colors.yellow,

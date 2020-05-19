@@ -3,7 +3,11 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+/*
+Auhtor Name - Aryan Khandelwal
+College - BIT MESRA
+Branch - IT
+ */
 class HighScoresState extends StatefulWidget {
   @override
   _HighScoresStateState createState() => _HighScoresStateState();
@@ -45,7 +49,7 @@ class _HighScoresStateState extends State<HighScoresState> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        
+
           color: Colors.yellow[50],
           child: ListView(
             children: <Widget>[

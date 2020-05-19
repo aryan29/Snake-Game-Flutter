@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import './GameSettings.dart';
+import 'dart:core';
 
 /*
 Auhtor Name - Aryan Khandelwal
@@ -17,7 +19,7 @@ final double INIT_HEIGHT = 60;
 final double INIT_WIDTH = 40;
 final assetsAudioPlayer = AssetsAudioPlayer();
 
-final TIMEOUT = 300;
+final TIMEOUT = 500;
 int score = 0;
 Timer timer;
 bool isStarted = false;
@@ -37,7 +39,7 @@ class head {
 class CakePos {
   static double posx, posy;
   static int type;
-  static List scores = [0, 50, 150];
+  static List scores = [1000, 50, 150];
 }
 
 Direction direction;
@@ -71,24 +73,32 @@ Container SnakePiece() {
     width: BLOCK_SIZE,
     height: BLOCK_SIZE,
     decoration: BoxDecoration(
-        color: Colors.black, borderRadius: BorderRadius.circular(10)),
+        color: GameSettings.snakeColor,
+        borderRadius: BorderRadius.circular(10)),
   );
+}
+
+BoxDecoration getCakeDecoration(int type) {
+  if (type == 1) {
+    return BoxDecoration(
+        color: Colors.brown, borderRadius: BorderRadius.circular(25));
+  } else if (type == 2) {
+    return BoxDecoration(
+        color: Colors.pink, borderRadius: BorderRadius.circular(1));
+  } else if (type == 0) {
+    return BoxDecoration(
+        color: Colors.purple, borderRadius: BorderRadius.circular(5));
+  }
 }
 
 Container Cake(int type) {
   return Container(
-    width: BLOCK_SIZE,
-    height: BLOCK_SIZE,
-    decoration: (type == 1)
-        ? BoxDecoration(
-            color: Colors.brown, borderRadius: BorderRadius.circular(25))
-        : BoxDecoration(
-            color: Colors.pink, borderRadius: BorderRadius.circular(1)),
-  );
+      width: BLOCK_SIZE,
+      height: BLOCK_SIZE,
+      decoration: getCakeDecoration(type));
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  @override
   void letsmove() {
     if (isRunning && isStarted) {
       if (direction == Direction.RIGHT)
@@ -181,18 +191,18 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   dynamic update_leaderboard() async {
-    print("Here at Uploading Leaderboard");
+    // print("Here at Uploading Leaderboard");
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> li = prefs.getStringList("highscores");
-    print(li);
+    // print(li);
     if (li == null)
       li = [score.toString()];
     else if (li.length < 5)
       li.add(score.toString());
     else {
       li.sort((a, b) {
-      return int.parse(a).compareTo(int.parse(b));
-    });
+        return int.parse(a).compareTo(int.parse(b));
+      });
       if (score > int.parse(li[0])) li[0] = score.toString();
     }
 
@@ -202,7 +212,7 @@ class _MyHomePageState extends State<MyHomePage> {
   dynamic print_leaderboard() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> li = prefs.getStringList("highscores");
-    print(li);
+    // print(li);
   }
 
   void gameover() async {
@@ -219,21 +229,28 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void dosomething() async {
-    assetsAudioPlayer.open(
-      Audio("assets/1.mp3"),
-    );
-
-    // print(result);
-    // if (result == 1) await audioPlayer.stop();
+    if (GameSettings.sounds == true) {
+      assetsAudioPlayer.open(Audio("assets/1.mp3"));
+    }
     int type = CakePos.type;
     score += CakePos.scores[type];
     produce_cake();
     snake.add(Positioned(left: head.x, top: head.y, child: SnakePiece()));
   }
 
+  bool containss(Positioned element) {
+    for (Positioned e in snake) {
+      if (e.left==element.left && e.top==element.top) return true;
+    }
+    return false;
+  }
+
   void moveright() {
+    // print("Moving Right");
     setState(() {
       head.x = head.x + BLOCK_SIZE;
+      if (containss(Positioned(child: SnakePiece(), top: head.y, left: head.x)))
+        gameover();
       if (head.x == CakePos.posx && head.y == CakePos.posy)
         dosomething();
       else {
@@ -250,8 +267,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void moveleft() {
+    // print("Moving Left");
     setState(() {
       head.x = head.x - BLOCK_SIZE;
+      if (containss(Positioned(child: SnakePiece(), top: head.y, left: head.x)))
+        gameover();
       if (head.x == CakePos.posx && head.y == CakePos.posy)
         dosomething();
       else {
@@ -264,8 +284,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void moveup() {
+    // print("Moving  Up");
     setState(() {
       head.y = head.y - BLOCK_SIZE;
+      if (containss(Positioned(child: SnakePiece(), top: head.y, left: head.x)))
+        gameover();
       if (head.x == CakePos.posx && head.y == CakePos.posy)
         dosomething();
       else {
@@ -280,6 +303,8 @@ class _MyHomePageState extends State<MyHomePage> {
   void movedown() {
     setState(() {
       head.y = head.y + BLOCK_SIZE;
+      if (containss(Positioned(child: SnakePiece(), top: head.y, left: head.x)))
+        gameover();
 
       if (head.x == CakePos.posx && head.y == CakePos.posy)
         dosomething();
@@ -289,6 +314,8 @@ class _MyHomePageState extends State<MyHomePage> {
       }
       if (head.y >= boundary.down) gameover();
       direction = Direction.DOWN;
+      // print("Direction Changed");
+      // print(direction);
     });
   }
 
@@ -302,188 +329,290 @@ class _MyHomePageState extends State<MyHomePage> {
         INIT_HEIGHT.toInt();
     CakePos.posx = w.toDouble();
     CakePos.posy = ht.toDouble();
-    List li = [1, 1, 1, 1, 2];
+    List li = [1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 0];
     CakePos.type = li[Random().nextInt(li.length)];
+  }
+
+  Widget controls() {
+    if (GameSettings.controltype == 1) {
+      // print("Position for controlType 1");
+      return Container(
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+            Container(
+                height: 100,
+                width: 100,
+                child: FittedBox(
+                  child: FloatingActionButton(
+                    backgroundColor: GameSettings.bcolor,
+                    heroTag: null,
+                    child: Icon(Icons.keyboard_arrow_left),
+                    onPressed: () {
+                      if (direction != Direction.RIGHT &&
+                          direction != Direction.LEFT &&
+                          isRunning &&
+                          isStarted) moveleft();
+                    },
+                  ),
+                )),
+            Column(
+              children: <Widget>[
+                Container(
+                    margin: EdgeInsets.only(bottom: 20),
+                    height: 100,
+                    width: 100,
+                    child: FittedBox(
+                      child: FloatingActionButton(
+                        backgroundColor: GameSettings.bcolor,
+                        heroTag: null,
+                        child: Icon(Icons.keyboard_arrow_up),
+                        onPressed: () {
+                          if (direction != Direction.DOWN &&
+                              direction != Direction.UP &&
+                              isRunning &&
+                              isStarted) moveup();
+                        },
+                      ),
+                    )),
+                Container(
+                    height: 100,
+                    width: 100,
+                    child: FittedBox(
+                      child: FloatingActionButton(
+                        heroTag: null,
+                        backgroundColor: GameSettings.bcolor,
+                        child: Icon(Icons.keyboard_arrow_down),
+                        onPressed: () {
+                          if (direction != Direction.UP &&
+                              direction != Direction.DOWN &&
+                              isRunning &&
+                              isStarted) movedown();
+                        },
+                      ),
+                    )),
+              ],
+            ),
+            Container(
+                height: 100,
+                width: 100,
+                child: FittedBox(
+                  child: FloatingActionButton(
+                    backgroundColor: GameSettings.bcolor,
+                    heroTag: null,
+                    child: Icon(Icons.keyboard_arrow_right),
+                    onPressed: () {
+                      if (direction != Direction.LEFT &&
+                          direction != Direction.RIGHT &&
+                          isRunning &&
+                          isStarted) moveright();
+                    },
+                  ),
+                )),
+          ]));
+    } else if (GameSettings.controltype == 2) {
+      return Container(color: Colors.grey);
+    } else if (GameSettings.controltype == 3) {
+      // print("here");
+      return Container(
+          child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          Container(
+              height: 200,
+              width: 100,
+              child: FittedBox(
+                child: FloatingActionButton(
+                  backgroundColor: GameSettings.bcolor,
+                  heroTag: null,
+                  child: Icon(Icons.rotate_left),
+                  onPressed: () {
+                    if (direction == Direction.RIGHT && isRunning && isStarted)
+                      moveup();
+                    else if (direction == Direction.DOWN &&
+                        isRunning &&
+                        isStarted)
+                      moveright();
+                    else if (direction == Direction.LEFT &&
+                        isRunning &&
+                        isStarted)
+                      movedown();
+                    else if (direction == Direction.UP &&
+                        isRunning &&
+                        isStarted) moveleft();
+                  },
+                ),
+              )),
+          Container(
+              height: 200,
+              width: 100,
+              child: FittedBox(
+                child: FloatingActionButton(
+                  backgroundColor: GameSettings.bcolor,
+                  heroTag: null,
+                  child: Icon(Icons.rotate_right),
+                  onPressed: () {
+                    // print(direction);
+                    if (direction == Direction.RIGHT &&
+                        isRunning &&
+                        isStarted) {
+                      movedown();
+                    } else if (direction == Direction.DOWN &&
+                        isRunning &&
+                        isStarted)
+                      moveleft();
+                    else if (direction == Direction.LEFT &&
+                        isRunning &&
+                        isStarted)
+                      moveup();
+                    else if (direction == Direction.UP &&
+                        isRunning &&
+                        isStarted) moveright();
+                  },
+                ),
+              )),
+        ],
+      ));
+    }
   }
 
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Container(
-      color: Colors.black,
-      height: MediaQuery.of(context).size.height,
-      width: MediaQuery.of(context).size.width,
-      child: Column(
-        children: <Widget>[
-          Stack(children: [
-            Container(
-                alignment: Alignment(0, -0.88),
-                color: Colors.black,
-                height: BOARD_HEIGHT + INIT_HEIGHT + 20,
-                width: BOARD_WIDTH + INIT_WIDTH + 20,
-                child: Text(
-                  "Score $score",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 17),
-                )),
-            Positioned(
-              left: INIT_WIDTH,
-              top: INIT_HEIGHT,
-              height: BOARD_HEIGHT,
-              width: BOARD_WIDTH,
-              child: Container(
-                key: key,
+        body: GestureDetector(
+      onPanUpdate: (drag) {
+        if (GameSettings.controltype == 2 && isRunning && isStarted) {
+          print("Position for controlType 2");
+          if (drag.delta.dx > 13 &&
+              direction != Direction.LEFT &&
+              direction != Direction.RIGHT) {
+            // print("Moving Right\n");
+            moveright();
+          } else if (drag.delta.dx < -13 &&
+              direction != Direction.RIGHT &&
+              direction != Direction.LEFT) {
+            // print("Moving Left\n");
+            moveleft();
+          } else if (drag.delta.dy > 13 &&
+              direction != Direction.UP &&
+              direction != Direction.DOWN) {
+            // print("Moving Down\n");
+            movedown();
+          } else if (drag.delta.dy < -13 &&
+              direction != Direction.DOWN &&
+              direction != Direction.UP) {
+            // print("Moving Up\n");
+            moveup();
+          }
+        }
+      },
+      child: Container(
+        color: GameSettings.bgcolor,
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        child: Column(
+          children: <Widget>[
+            Stack(children: [
+              Container(
+                  alignment: Alignment(0, -0.88),
+                  color: GameSettings.bgcolor,
+                  height: BOARD_HEIGHT + INIT_HEIGHT + 20,
+                  width: BOARD_WIDTH + INIT_WIDTH + 20,
+                  child: Text(
+                    "Score $score",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 17),
+                  )),
+              Positioned(
+                left: INIT_WIDTH,
+                top: INIT_HEIGHT,
                 height: BOARD_HEIGHT,
                 width: BOARD_WIDTH,
-                // color: Colors.white,
-                decoration: BoxDecoration(
-                  color: Colors.white,
+                child: Container(
+                  key: key,
+                  height: BOARD_HEIGHT,
+                  width: BOARD_WIDTH,
+                  // color: Colors.white,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                  ),
                 ),
               ),
-            ),
-            for (var i in snake) i,
+              for (var i in snake) i,
+              Container(
+                child: isStarted
+                    ? Positioned(
+                        left: CakePos.posx,
+                        top: CakePos.posy,
+                        child: Cake(CakePos.type))
+                    : null,
+              )
+            ]),
             Container(
-              child: isStarted
-                  ? Positioned(
-                      left: CakePos.posx,
-                      top: CakePos.posy,
-                      child: Cake(CakePos.type))
-                  : null,
-            )
-          ]),
-          Container(
-            height: 100,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                Container(
-                  width: 150,
-                  height: 50,
-                  child: FlatButton.icon(
-                    textColor: Colors.white,
-                    color: Colors.blue,
-                    onPressed: () {
-                      if (!isStarted) {
-                        isStarted = true;
-                        isRunning = true;
-                        snake.clear();
-                        snake.add(Positioned(
-                            left: INIT_WIDTH,
-                            top: INIT_HEIGHT,
-                            child: SnakePiece()));
-                        snake.add(Positioned(
-                            left: INIT_WIDTH + 20,
-                            top: INIT_HEIGHT,
-                            child: SnakePiece()));
-                        produce_cake();
-                        head.x = INIT_WIDTH + 20;
-                        head.y = INIT_HEIGHT;
-                        direction = Direction.RIGHT;
-                        timer = new Timer.periodic(
-                            new Duration(milliseconds: TIMEOUT),
-                            (Timer t) => letsmove());
-                      }
-                    },
-                    icon: Icon(
-                      Icons.star,
-                      size: 30,
-                    ),
-                    label: Text("Start"),
-                  ),
-                ),
-                Container(
-                  width: 150,
-                  height: 50,
-                  child: FlatButton.icon(
-                    textColor: Colors.white,
-                    color: Colors.blue,
-                    onPressed: () {
-                      setState(() {
-                        isRunning = !isRunning;
-                      });
-                    },
-                    icon: isRunning
-                        ? Icon(Icons.pause, size: 30)
-                        : Icon(Icons.play_arrow, size: 30),
-                    label: isRunning ? Text("Pause") : Text("Resume"),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
+              height: 100,
               child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                Container(
-                    height: 100,
-                    width: 100,
-                    child: FittedBox(
-                      child: FloatingActionButton(
-                        heroTag: null,
-                        child: Icon(Icons.keyboard_arrow_left),
-                        onPressed: () {
-                          if (direction != Direction.RIGHT &&
-                              direction != Direction.LEFT &&
-                              isRunning &&
-                              isStarted) moveleft();
-                        },
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  Container(
+                    width: 150,
+                    height: 50,
+                    child: FlatButton.icon(
+                      textColor: Colors.white,
+                      color: GameSettings.bcolor,
+                      onPressed: () {
+                        if (!isStarted) {
+                          isStarted = true;
+                          isRunning = true;
+                          snake.clear();
+                          snake.add(Positioned(
+                              left: INIT_WIDTH,
+                              top: INIT_HEIGHT,
+                              child: SnakePiece()));
+                          snake.add(Positioned(
+                              left: INIT_WIDTH + 20,
+                              top: INIT_HEIGHT,
+                              child: SnakePiece()));
+                          produce_cake();
+                          head.x = INIT_WIDTH + 20;
+                          head.y = INIT_HEIGHT;
+                          direction = Direction.RIGHT;
+                          timer = new Timer.periodic(
+                              new Duration(milliseconds: TIMEOUT),
+                              (Timer t) => letsmove());
+                        }
+                      },
+                      icon: Icon(
+                        Icons.star,
+                        size: 30,
                       ),
-                    )),
-                Column(
-                  children: <Widget>[
-                    Container(
-                        margin: EdgeInsets.only(bottom: 20),
-                        height: 100,
-                        width: 100,
-                        child: FittedBox(
-                          child: FloatingActionButton(
-                            heroTag: null,
-                            child: Icon(Icons.keyboard_arrow_up),
-                            onPressed: () {
-                              if (direction != Direction.DOWN &&
-                                  direction != Direction.UP &&
-                                  isRunning &&
-                                  isStarted) moveup();
-                            },
-                          ),
-                        )),
-                    Container(
-                        height: 100,
-                        width: 100,
-                        child: FittedBox(
-                          child: FloatingActionButton(
-                            heroTag: null,
-                            child: Icon(Icons.keyboard_arrow_down),
-                            onPressed: () {
-                              if (direction != Direction.UP &&
-                                  direction != Direction.DOWN &&
-                                  isRunning &&
-                                  isStarted) movedown();
-                            },
-                          ),
-                        )),
-                  ],
-                ),
-                Container(
-                    height: 100,
-                    width: 100,
-                    child: FittedBox(
-                      child: FloatingActionButton(
-                        heroTag: null,
-                        child: Icon(Icons.keyboard_arrow_right),
-                        onPressed: () {
-                          if (direction != Direction.LEFT &&
-                              direction != Direction.RIGHT &&
-                              isRunning &&
-                              isStarted) moveright();
-                        },
-                      ),
-                    )),
-              ]))
-        ],
+                      label: Text("Start"),
+                    ),
+                  ),
+                  Container(
+                    width: 150,
+                    height: 50,
+                    child: FlatButton.icon(
+                      textColor: Colors.white,
+                      color: GameSettings.bcolor,
+                      onPressed: () {
+                        setState(() {
+                          isRunning = !isRunning;
+                        });
+                      },
+                      icon: isRunning
+                          ? Icon(Icons.pause, size: 30)
+                          : Icon(Icons.play_arrow, size: 30),
+                      label: isRunning ? Text("Pause") : Text("Resume"),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            controls()
+          ],
+        ),
       ),
     ));
   }
