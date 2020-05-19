@@ -1,3 +1,7 @@
+<img src="ReadmeAssets/My Post (4).png" width="100%" height=400px/>
+<br/>
+
+
 ## Snake Game
 A snake Game Made with Flutter
 
