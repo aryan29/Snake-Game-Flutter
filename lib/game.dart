@@ -179,7 +179,10 @@ class _MyHomePageState extends State<MyHomePage> {
                           width: 100,
                           child: FlatButton(
                               color: Colors.yellow,
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                startGame();
+                              },
                               child: Text("Retry")),
                         ),
                       ],
@@ -240,7 +243,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   bool containss(Positioned element) {
     for (Positioned e in snake) {
-      if (e.left==element.left && e.top==element.top) return true;
+      if (e.left == element.left && e.top == element.top) return true;
     }
     return false;
   }
@@ -477,6 +480,24 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  void startGame() {
+    if (!isStarted) {
+      isStarted = true;
+      isRunning = true;
+      snake.clear();
+      snake.add(
+          Positioned(left: INIT_WIDTH, top: INIT_HEIGHT, child: SnakePiece()));
+      snake.add(Positioned(
+          left: INIT_WIDTH + 20, top: INIT_HEIGHT, child: SnakePiece()));
+      produce_cake();
+      head.x = INIT_WIDTH + 20;
+      head.y = INIT_HEIGHT;
+      direction = Direction.RIGHT;
+      timer = new Timer.periodic(
+          new Duration(milliseconds: TIMEOUT), (Timer t) => letsmove());
+    }
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
         body: GestureDetector(
@@ -562,26 +583,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       textColor: Colors.white,
                       color: GameSettings.bcolor,
                       onPressed: () {
-                        if (!isStarted) {
-                          isStarted = true;
-                          isRunning = true;
-                          snake.clear();
-                          snake.add(Positioned(
-                              left: INIT_WIDTH,
-                              top: INIT_HEIGHT,
-                              child: SnakePiece()));
-                          snake.add(Positioned(
-                              left: INIT_WIDTH + 20,
-                              top: INIT_HEIGHT,
-                              child: SnakePiece()));
-                          produce_cake();
-                          head.x = INIT_WIDTH + 20;
-                          head.y = INIT_HEIGHT;
-                          direction = Direction.RIGHT;
-                          timer = new Timer.periodic(
-                              new Duration(milliseconds: TIMEOUT),
-                              (Timer t) => letsmove());
-                        }
+                        startGame();
                       },
                       icon: Icon(
                         Icons.star,
