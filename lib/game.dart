@@ -628,7 +628,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   // color: Colors.white,
                   decoration: BoxDecoration(
                     // color: Colors.white,
-                    image: DecorationImage(fit:BoxFit.cover,image: AssetImage("assets/images/wall1.jpeg"))
+                    image: DecorationImage(fit:BoxFit.cover,image: AssetImage("assets/images/grass2.jpeg"))
                   ),
                 ),
               ),

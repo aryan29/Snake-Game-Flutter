@@ -4,12 +4,14 @@ A snake Game Made with Flutter
 ### Description
 This is a small project made in flutter
 currently it has fully customized colors
-and 3 control modes
+and 4 control modes
 
 ### Control Modes
 * Tap on Buttons and Play(Default Mode)
 * Touch Screen Mode
 * Tap and Rotate
+* Button Control Mode
+
 
 
 ## Demo
@@ -23,6 +25,9 @@ and 3 control modes
 <img src="ReadmeAssets/1.jpeg" height="200"></img>&nbsp;
 <img src="ReadmeAssets/6.jpeg" height="200"></img>&nbsp;
 <img src="ReadmeAssets/5.jpeg" height="200"></img>&nbsp;
+<br/>
+<img src="ReadmeAssets/7.jpeg" height="200"></img>&nbsp;
+<img src="ReadmeAssets/8.jpeg" height="200"></img>&nbsp;
 
 
 ## Contribute
