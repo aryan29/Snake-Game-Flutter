@@ -53,24 +53,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        // bottomNavigationBar: Container(
-        //   child: BottomNavigationBar(
-        //     selectedItemColor: Colors.green,
-        //     unselectedItemColor: Colors.green,
-        //       elevation: 15,
-        //       onTap: (int index) {
-        //         if (index == 0) print("Youtube");
-        //           else if(index==1)print("Share");
-        //           },
-        //       items: [
-        //         BottomNavigationBarItem(
-        //           icon: Icon(Icons.youtube_searched_for),
-        //           title: Text("Youtube"),
-        //         ),
-        //         BottomNavigationBarItem(
-        //             icon: Icon(Icons.settings), title: Text("Share")),
-        //       ]),
-        // ),
         body: Container(
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(

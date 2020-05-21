@@ -223,10 +223,8 @@ class _MyHomePageState extends State<MyHomePage> {
     isRunning = false;
     snake.clear();
     timer?.cancel();
-    //Update the leaderboard
     print("Game Over");
     await update_leaderboard();
-    // await print_leaderboard();
     await openDialog();
     score = 0;
   }
@@ -249,7 +247,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void moveright() {
-    // print("Moving Right");
     setState(() {
       head.x = head.x + BLOCK_SIZE;
       if (containss(Positioned(child: SnakePiece(), top: head.y, left: head.x)))
@@ -270,7 +267,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void moveleft() {
-    // print("Moving Left");
     setState(() {
       head.x = head.x - BLOCK_SIZE;
       if (containss(Positioned(child: SnakePiece(), top: head.y, left: head.x)))
@@ -430,6 +426,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   backgroundColor: GameSettings.bcolor,
                   heroTag: null,
                   child: Icon(Icons.rotate_left),
+                  //Anticlockwise
                   onPressed: () {
                     if (direction == Direction.RIGHT && isRunning && isStarted)
                       moveup();
@@ -456,7 +453,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   heroTag: null,
                   child: Icon(Icons.rotate_right),
                   onPressed: () {
-                    // print(direction);
+                    // Clockwise
                     if (direction == Direction.RIGHT &&
                         isRunning &&
                         isStarted) {
@@ -477,7 +474,80 @@ class _MyHomePageState extends State<MyHomePage> {
               )),
         ],
       ));
+    } else if (GameSettings.controltype == 4) {
+      return Container(
+          height: 200,
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  getButton("1", false),
+                  getButton("2", true),
+                  getButton("3", false),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  getButton("4", true),
+                  getButton("5", false),
+                  getButton("6", true),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  getButton("7", false),
+                  getButton("8", true),
+                  getButton("9", false),
+                ],
+              ),
+            ],
+          ));
     }
+  }
+
+  Expanded getButton(String s, bool detectTap) {
+    return Expanded(
+        child: InkWell(
+                onTap: () {
+        if (direction != Direction.UP &&
+            direction != Direction.DOWN &&
+            isRunning &&
+            isStarted &&
+            s == "8")
+          movedown();
+        else if (direction != Direction.DOWN &&
+            direction != Direction.UP &&
+            isRunning &&
+            isStarted &&
+            s == "2")
+          moveup();
+        else if (direction != Direction.RIGHT &&
+            direction != Direction.LEFT &&
+            isRunning &&
+            isStarted &&
+            s == "4")
+          moveleft();
+        else if (direction != Direction.RIGHT &&
+            direction != Direction.LEFT &&
+            isRunning &&
+            isStarted &&
+            s == "6") moveright();
+      },
+                  child: Container(
+              alignment: Alignment.center,
+              height: 60,
+              width: 50,
+              color: GameSettings.bcolor,
+              child: Text(s,style:TextStyle(color:Colors.white))),
+        ),
+  );
+
   }
 
   void startGame() {
@@ -557,7 +627,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   width: BOARD_WIDTH,
                   // color: Colors.white,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    // color: Colors.white,
+                    image: DecorationImage(fit:BoxFit.cover,image: AssetImage("assets/images/wall1.jpeg"))
                   ),
                 ),
               ),

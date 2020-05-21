@@ -1,0 +1,8 @@
+{
+    "bracketPairColorizer.showBracketsInRuler": true,
+    "bracketPairColorizer.forceUniqueOpeningColor": true,
+    "bracketPairColorizer.forceIterationColorCycle": true,
+    "bracketPairColorizer.highlightActiveScope": true,
+    "bracketPairColorizer.showBracketsInGutter": true,
+    "timeline.pageOnScroll": true
+}

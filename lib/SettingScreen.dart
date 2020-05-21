@@ -142,7 +142,7 @@ class _SettingScreenState extends State<SettingScreen> {
                                 GameSettings.controltype = 4;
                               },
                               icon: Icon(Icons.speaker_group),
-                              label: Text("Not Functional")),
+                              label: Text("9 Buttons")),
                         ),
                       ],
                     ),
